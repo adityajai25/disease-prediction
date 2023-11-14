@@ -7,19 +7,10 @@ import bz2
 import datetime
 import numpy as np
 import pandas as pd
-from pymongo.mongo_client import MongoClient
+from flask import Flask, request, jsonify
+from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
-
-uri = "mongodb+srv://adityajai243:db2023@cluster0.buez9p5.mongodb.net/?retryWrites=true&w=majority"
-# Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
-# Send a ping to confirm a successful connection
-try:
-    client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
-except Exception as e:
-    print(e)
 
 app = Flask(__name__)
 CORS(app)
@@ -30,16 +21,50 @@ scaler=pickle.load(scalarobject)
 modelforpred = bz2.BZ2File("Model\modelForPrediction.pkl", "rb")
 model = pickle.load(modelforpred)
 
+## Mongo db connection
+uri = "mongodb+srv://adityajai243:db2023@cluster0.buez9p5.mongodb.net/?retryWrites=true&w=majority"
+
+
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+# Define the database and collection
+db = client['Patient']  # Database name
+collection = db['patient-login']  # Collection name
+
+
+##Route for checking backend connection
+@app.route('/add', methods=['POST'])
+def add():
+     if request.method == 'POST':
+        data = request.json
+
+        # Insert patient data into the collection
+        inserted_patient = collection.insert_one(data)
+
+        if inserted_patient.inserted_id:
+            return jsonify({'message': 'Patient added successfully'}), 201
+
+        return jsonify({'message': 'Invalid request'}), 400
+
 ## Route for homepage
 
-@app.route('/abc',methods=['GET','POST'])
+@app.route('/',methods=['GET','POST'])
 def index():
     return render_template('index.html')
 
 ## Route for patient Registration
-@app.route('/',methods=['GET','POST'])
+@app.route('/add-patients',methods=['GET','POST'])
 def reg():
     return render_template('patient-registration.html')
+
 
 ## Route for Single data point prediction
 @app.route('/diabetes',methods=['GET','POST'])
