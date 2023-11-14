@@ -32,9 +32,14 @@ model = pickle.load(modelforpred)
 
 ## Route for homepage
 
-@app.route('/',methods=['GET','POST'])
+@app.route('/abc',methods=['GET','POST'])
 def index():
     return render_template('index.html')
+
+## Route for patient Registration
+@app.route('/',methods=['GET','POST'])
+def reg():
+    return render_template('patient-registration.html')
 
 ## Route for Single data point prediction
 @app.route('/diabetes',methods=['GET','POST'])
