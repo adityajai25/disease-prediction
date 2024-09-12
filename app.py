@@ -8,7 +8,6 @@ import datetime
 import numpy as np
 import pandas as pd
 from flask import Flask, request, jsonify
-from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
 
@@ -21,12 +20,6 @@ scaler=pickle.load(scalarobject)
 modelforpred = bz2.BZ2File("Model\modelForPrediction.pkl", "rb")
 model = pickle.load(modelforpred)
 
-## Mongo db connection
-uri = "mongodb+srv://adityajai243:db2023@cluster0.buez9p5.mongodb.net/?retryWrites=true&w=majority"
-
-
-# Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
 
 # Send a ping to confirm a successful connection
 try:
@@ -34,11 +27,6 @@ try:
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
-
-# Define the database and collection
-db = client['Patient']  # Database name
-collection = db['patient-login']  # Collection name
-
 
 ##Route for checking backend connection
 @app.route('/add', methods=['POST'])
